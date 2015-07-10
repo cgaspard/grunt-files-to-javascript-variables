@@ -1,5 +1,5 @@
 {
-  "name": "grunt-files-to-javascript-variables",
+  "name": "grunt-files-to-javascript-variables-chunks",
   "description": "Appends file contents to Javascript variables.",
   "version": "0.2.4",
   "homepage": "https://github.com/nikolayhg/grunt-files-to-javascript-variables",
@@ -7,6 +7,12 @@
     "name": "Nikolay Georgiev",
     "email": "nikolay@georgiev.cc"
   },
+  "contributors": [
+    {
+      "name": "Corey Gaspard",
+      "email": "cgaspard@gmail.com"
+    }
+  ],
   "repository": {
     "type": "git",
     "url": "git@github.com:nikolayhg/grunt-files-to-javascript-variables.git"
