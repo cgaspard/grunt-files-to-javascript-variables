@@ -134,21 +134,38 @@ FilesToJavascriptTask.prototype = {
 
                 grunt.log.debug('File contents added to: ' + fullProperty);
 
-                if (options.inputFileExtension === 'json') {
-                  // leave the json contents, without quoting them.
-                } else {
-                  // quote everything which is not json
-                  inputFileString = '\'' + inputFileString + '\'';
-                }
+                if(options.outputChunkSize) {
+                    outputFileString += inputFileString;
 
-                outputFileString += '\n' + fullProperty +
-                    ' = ' + inputFileString + ';\n';
+                }else {
+
+                    if (options.inputFileExtension === 'json') {
+                      // leave the json contents, without quoting them.
+                    } else {
+                      // quote everything which is not json
+                      inputFileString = '\'' + inputFileString + '\'';
+                    }
+                    outputFileString += '\n' + fullProperty +
+                        ' = ' + inputFileString + ';\n';
+                }
             }
         });
 
-        var outputBaseFileString = grunt.file.read(options.outputBaseFile);
-        grunt.file.write(options.outputFile, outputBaseFileString + outputFileString);
-        grunt.log.writeln('File saved: ' + options.outputFile);
+        if(!options.outputChunkSize) {
+            var outputBaseFileString = grunt.file.read(options.outputBaseFile);
+            grunt.file.write(options.outputFile, outputBaseFileString + outputFileString);
+            grunt.log.writeln('File saved: ' + options.outputFile);
+        } else {
+            var outputFileArray = outputFileString.chunk(options.outputChunkSize);
+            var finalOutString = "var " + options.outputChunVariableName + " = '';";
+            for(var i = 0; i < outputFileArray.length; i++) {
+                if(!!outputFileArray[i]) {
+                    finalOutString += "\r\n" + options.outputChunVariableName + " += '" + outputFileArray[i] + "';";
+                }
+            }
+            grunt.file.write(options.outputFile, finalOutString);    
+            // grunt.log.writeln('File saved: ' + options.outputFile);
+        }
     },
 
     checkOptions : function () {
@@ -196,3 +213,10 @@ if (typeof String.prototype.endsWith !== 'function') {
         return this.slice(this.length - str.length, this.length) === str;
     };
 }
+
+
+String.prototype.chunk = function(size) {
+    return [].concat.apply([],
+        this.split('').map(function(x,i){ return i%size ? [] : this.slice(i,i+size); }, this)
+    );
+};
